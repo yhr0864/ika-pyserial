@@ -1,31 +1,32 @@
-# ika-remote-control
-remote control of hotplate through pyserial and opc ua based on BBB
+# IKA Remote Control
+
+This project facilitates the remote control of an IKA hotplate using PySerial and OPC UA, with the BeagleBone Black (BBB) serving as the main controller.
 
 ## About The Project
 
-![alt text](./images/remote_control_scheme.png?raw=true)
+![Remote Control Scheme](./images/remote_control_scheme.png?raw=true)
 
-We plan to communicate with ika hotplate through OPC UA server-client with the help of MCU (BeagleBone Black), which is connected to the PC through USB cable.
+This project aims to establish communication with an IKA hotplate through an OPC UA server-client setup. The system is powered by a BeagleBone Black (BBB), which is connected to a PC via a USB cable.
 
-Here's communication progress:
-* We send NAMUR commands from client on PC to the server on BBB
-* The server received the command and the client on the BBB read from the server
-* The recieved commands are then sent to the device ika hotplate
+### Communication Workflow:
+- **Command Transmission:** NAMUR commands are sent from the client on the PC to the server running on the BBB.
+- **Command Reception:** The server on the BBB receives the commands, and the client on the BBB reads these commands from the server.
+- **Device Control:** The received commands are then forwarded to the IKA hotplate for execution.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Getting Started
 
-Here shows how to start with the following instructions.
+Follow the instructions below to set up and start the project.
 
 
 ### Installation
 
-Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services.
+To set up the project, perform the following steps:
 
 1. Clone the repo
    ```sh
-   git clone https://github.com/github_username/repo_name.git
+   git clone https://github.com/yhr0864/ika-pyserial.git
    ```
 2. Install required packages
    ```sh
