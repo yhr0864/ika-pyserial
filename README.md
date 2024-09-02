@@ -3,7 +3,7 @@ remote control of hotplate through pyserial and opc ua based on BBB
 
 ## About The Project
 
-![alt text](https://github.com/yhr0864/ika-pyserial/tree/main/images/remote_control_scheme.png?raw=true)
+![alt text](./images/remote_control_scheme.png?raw=true)
 
 We plan to communicate with ika hotplate through OPC UA server-client with the help of MCU (BeagleBone Black), which is connected to the PC through USB cable.
 
