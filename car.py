@@ -20,28 +20,38 @@ class Vehicle(object):
 
 if __name__ == "__main__":
     car = Vehicle()
+
     # Connect to the existing shared memory block using the known name
     shm_name = "my_custom_shm"
     existing_shm = shared_memory.SharedMemory(name=shm_name)
 
-    # Define the format and size for unpacking the integers (must match the original format)
-    data_size = 1
+    # Define the size based on the longest possible traffic light state (green, yellow, red)
+    data_size = 6  # "yellow" is the longest state with 6 characters
 
-    while True:
-        time.sleep(1)
-        # Read the byte data from shared memory
-        data_bytes = bytes(existing_shm.buf[:data_size])
+    try:
+        while True:
+            time.sleep(1)
 
-        # Convert the bytes back into a string
-        data = data_bytes.decode(
-            "utf-8"
-        ).rstrip()  # Use .rstrip() to remove trailing whitespace
-        print(f"Now is {data}")
-        if data == "red":
-            car.light_turns_red()
-            print("car stops")
-        elif data == "green":
-            car.light_turns_green()
-            print("car moves")
-        else:
-            pass
+            # Read the byte data from shared memory
+            data_bytes = bytes(existing_shm.buf[:data_size])
+
+            # Convert the bytes back into a string and remove null bytes
+            data = data_bytes.decode("utf-8").rstrip("\x00")
+            print(f"Now is {data}")
+
+            # Transition based on the traffic light state
+            if data == "red" and car.state == "moving":
+                car.light_turns_red()
+                print("Car stops")
+            elif data == "green" and car.state == "stop":
+                car.light_turns_green()
+                print("Car moves")
+            else:
+                # Add any specific behavior for "yellow" or any other state
+                print("Waiting...")
+
+    except KeyboardInterrupt:
+        pass
+    finally:
+        # Clean up shared memory
+        existing_shm.close()
