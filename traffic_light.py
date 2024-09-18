@@ -19,20 +19,38 @@ class TrafficLight(object):
 
 if __name__ == "__main__":
     traffic_light = TrafficLight()
-    # Example data (a list of integers)
-    data = " "
-    data_bytes = data.encode("utf-8")
 
-    data_size = len(data_bytes)
+    # Define the shared memory size based on the longest state name
+    max_state_length = max(len(state) for state in TrafficLight.states)
+    data_size = max_state_length
 
-    # Create shared memory with a custom name
+    # Create shared memory with a custom name and size sufficient for the states
     shm = shared_memory.SharedMemory(name="my_custom_shm", create=True, size=data_size)
 
-    while True:
-        time.sleep(2)
-        traffic_light.timeup()
-        data = traffic_light.state
+    try:
+        while True:
+            # Sleep for 2 seconds to simulate state changes
+            time.sleep(2)
 
-        print(data)
-        # Pack and write the data to shared memory
-        shm.buf[:data_size] = data_bytes
+            # Trigger state transition
+            traffic_light.timeup()
+
+            # Get the new state and encode it as bytes
+            data = traffic_light.state
+            data_bytes = data.encode("utf-8")
+
+            # Zero out the buffer to prevent leftover data from previous writes
+            shm.buf[:data_size] = b'\x00' * data_size
+
+            # Write the new data to shared memory (only as many bytes as needed)
+            shm.buf[:len(data_bytes)] = data_bytes
+
+            # For debugging, print the current state
+            print(f"Current state: {data}")
+
+    except KeyboardInterrupt:
+        pass
+    finally:
+        # Clean up shared memory when done
+        shm.close()
+        shm.unlink()
