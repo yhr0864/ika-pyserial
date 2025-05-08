@@ -6,39 +6,57 @@ This project facilitates the remote control of an IKA hotplate using PySerial an
 
 ![Remote Control Scheme](./images/remote_control_scheme.png?raw=true)
 
-This project aims to establish communication with an IKA hotplate through an OPC UA server-client setup. The system is powered by a BeagleBone Black (BBB), which is connected to a PC via a USB cable.
+This project aims to establish communication with an IKA hotplate through an OPC UA server setup. The system is powered by a BeagleBone Black (BBB), which is connected to a PC via a USB cable.
 
 ### Communication Workflow:
-- **Command Transmission:** NAMUR commands are sent from the client on the PC to the server running on the BBB.
-- **Command Reception:** The server on the BBB receives the commands, and the client on the BBB reads these commands from the server.
+- **Command Transmission:** NAMUR commands are sent from the client/UaExpert on the PC to the server running on the BBB.
+- **Command Reception:** The server on the BBB receives the commands, and then send these commands to hot plate via usb serial communication.
 - **Device Control:** The received commands are then forwarded to the IKA hotplate for execution.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Getting Started
+Just follow the steps below when you connect your Beagle Bone Black via SSH.
 
-Follow the instructions below to set up and start the project.
-
-
-### Installation
-
-To set up the project, perform the following steps:
-
-1. Clone the repo
+1. Clone the repo on Beagle Bone Black
    ```sh
+
    git clone https://github.com/yhr0864/ika-pyserial.git
+
    ```
-2. Install required packages
+2. Create virtual environment
+
    ```sh
+
+   python -m venv my_env
+
+   ```
+3. Install required packages
+
+   ```sh
+
    pip install -r requirement.txt
+
    ```
-3. Run the server first
+4. Activate environment
+
    ```sh
-   python server.py
+
+   source my_env/bin/activate
+
    ```
-4. Run the client
+5. Run the server first
+
    ```sh
-   python client.py
+
+   python ./src/opcua-asyncio/opcua-asyncio_server.py
+
+   ```
+6. Ether run the client code or use UaExpert to send command
+   ```sh
+
+   python ./src/original/client_write.py
+
    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
