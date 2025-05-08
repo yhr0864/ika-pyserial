@@ -1,42 +1,55 @@
 from opcua import Client
 import time
 
-# Define the OPC UA server URL
-# url = "opc.tcp://129.13.79.172"
-url = "opc.tcp://192.168.7.2:4841"
 
-# Create and connect the client
-client = Client(url)
+class HotplateClient:
+    def __init__(self, server_url, namespace_uri, node_id=2):
+        self.server_url = server_url
+        self.namespace_uri = namespace_uri
+        self.node_id = node_id
+        self.client = Client(self.server_url)
+        self.node = None
 
-try:
-    client.connect()
-    print("Client connected to OPC UA server")
+    def connect(self):
+        self.client.connect()
+        print(f"Connected to OPC UA server at {self.server_url}")
+        idx = self.client.get_namespace_index(self.namespace_uri)
+        self.node = self.client.get_node(f"ns={idx};i={self.node_id}")
 
-    # Get the namespace index from the server
-    idx = client.get_namespace_index("http://example.org/opcuapy")
-    node = client.get_node("ns={};i=2".format(idx))
+    def disconnect(self):
+        self.client.disconnect()
+        print("Disconnected from OPC UA server")
 
-    # Write a new value to the variable
+    def send_commands(self, commands, delay=1):
+        for cmd in commands:
+            self.node.set_value(cmd)
+            print(f"Sent command: {cmd.strip()}")
+            time.sleep(delay)
+
+
+if __name__ == "__main__":
+    SERVER_URL = "opc.tcp://localhost:4841"
+    NAMESPACE_URI = "http://emap.kit.edu/haoran"
+
     commands = [
-        "IN_NAME\r\n",  # read the device name
-        "OUT_SP_1 30\r\n",  # set temperature value 30
-        "OUT_SP_4 150\r\n",  # set speed value 150
-        "START_1\r\n",  # start the heater
-        "START_4\r\n",  # start the motor
+        "IN_NAME\r\n",  # Read device name
+        "OUT_SP_1 30\r\n",  # Set temperature to 30
+        "OUT_SP_4 150\r\n",  # Set speed to 150
+        "START_1\r\n",  # Start heater
+        "START_4\r\n",  # Start motor
     ]
 
-    for command in commands:
-        node.set_value(command)
-        print(f"Written command: {command}")
+    client = HotplateClient(SERVER_URL, NAMESPACE_URI)
 
-        time.sleep(1)
+    try:
+        client.connect()
+        client.send_commands(commands)
 
-except KeyboardInterrupt:
-    print("Client stopped manually")
+    except KeyboardInterrupt:
+        print("Client stopped manually")
 
-except Exception as e:
-    print(f"An error occurred: {e}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
-finally:
-    client.disconnect()
-    print("Client disconnected")
+    finally:
+        client.disconnect()
