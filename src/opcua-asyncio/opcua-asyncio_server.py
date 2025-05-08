@@ -30,6 +30,7 @@ class HotplateController:
         self.prev_start_heater = False
 
     async def setup(self):
+        # Setup all the opcua nodes
         await self.server.init()
         self.idx = await self.server.register_namespace(self.namespace)
         node = self.server.nodes.objects
@@ -45,6 +46,7 @@ class HotplateController:
         await self.start_heater.set_writable()
 
     async def send_command(self, command, timeout=1):
+        # Send commands and wait for feedback
         clean_command = command.strip() + "\r\n"
         self.ser.write(clean_command.encode("utf-8"))
         await asyncio.sleep(0.5)
@@ -105,6 +107,7 @@ class HotplateController:
 
 
 if __name__ == "__main__":
+    # Change the port and server_url based on your practical use
     controller = HotplateController(
         port="COM16",
         baudrate=9600,

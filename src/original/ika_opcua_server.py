@@ -26,6 +26,7 @@ class HotplateController:
         self.prev_start_heater = False
 
     def _setup_opcua_nodes(self):
+        # Setup all the opcua nodes
         node = self.server.nodes.objects
         device = node.add_object(self.idx, "IKA_hotplate")
 
@@ -47,6 +48,7 @@ class HotplateController:
         print("Server stopped")
 
     def send_command(self, command, timeout=1):
+        # Send commands and wait for feedback
         clean_command = command.strip() + "\r\n"
         self.ser.write(clean_command.encode("utf-8"))
         time.sleep(0.5)
@@ -95,6 +97,7 @@ class HotplateController:
 
 
 if __name__ == "__main__":
+    # Change the port and server_url based on your practical use
     controller = HotplateController(
         port="COM16",
         baudrate=9600,
