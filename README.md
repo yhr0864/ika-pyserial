@@ -45,7 +45,7 @@ Just follow the steps below when you connect your Beagle Bone Black via SSH.
    source my_env/bin/activate
 
    ```
-5. Run the server first
+5. Run the server first (Note: you may need to reset the COM port and server URL first!)
 
    ```sh
 
