@@ -1,6 +1,13 @@
 from opcua import Client
 import time
 
+nodes = {
+    "GET_NAME": "ns=2;i=2",
+    "READ_TEMP": "ns=2;i=5",
+    "SET_TEMP": "ns=2;i=3",
+    "START_HEATER": "ns=2;i=4",
+}
+
 
 class HotplateClient:
     def __init__(self, server_url, namespace_uri, node_id=2):
@@ -13,37 +20,32 @@ class HotplateClient:
     def connect(self):
         self.client.connect()
         print(f"Connected to OPC UA server at {self.server_url}")
-        idx = self.client.get_namespace_index(self.namespace_uri)
-        self.node = self.client.get_node(f"ns={idx};i={self.node_id}")
+        self.node_objects = {
+            key: self.client.get_node(value) for key, value in nodes.items()
+        }
 
     def disconnect(self):
         self.client.disconnect()
         print("Disconnected from OPC UA server")
 
-    def send_commands(self, commands, delay=1):
-        for cmd in commands:
-            self.node.set_value(cmd)
-            print(f"Sent command: {cmd.strip()}")
-            time.sleep(delay)
+    def execute(self, node: str, command):
+        self.node_objects[node].set_value(command)
 
 
 if __name__ == "__main__":
     SERVER_URL = "opc.tcp://localhost:4841"
     NAMESPACE_URI = "http://emap.kit.edu/haoran"
 
-    commands = [
-        "IN_NAME\r\n",  # Read device name
-        "OUT_SP_1 30\r\n",  # Set temperature to 30
-        "OUT_SP_4 150\r\n",  # Set speed to 150
-        "START_1\r\n",  # Start heater
-        "START_4\r\n",  # Start motor
-    ]
-
     client = HotplateClient(SERVER_URL, NAMESPACE_URI)
 
     try:
         client.connect()
-        client.send_commands(commands)
+        while True:
+            node, cmd = input(
+                "Give the input for Node and Command (space-separated): "
+            ).split(" ")
+            client.execute(node, cmd)
+            time.sleep(0.1)
 
     except KeyboardInterrupt:
         print("Client stopped manually")
